@@ -1,0 +1,32 @@
+
+{
+  "name": "Volatile Demand",
+  "pattern": "volatile",
+  "description": "Demand fluctuates significantly without a consistent upward or downward trend.",
+  "examples": [
+    { "month": 1, "sales": 80 },
+    { "month": 2, "sales": 135 },
+    { "month": 3, "sales": 65 },
+    { "month": 4, "sales": 145 },
+    { "month": 5, "sales": 95 },
+    { "month": 6, "sales": 120 },
+    { "month": 7, "sales": 55 },
+    { "month": 8, "sales": 155 },
+    { "month": 9, "sales": 85 },
+    { "month": 10, "sales": 130 },
+    { "month": 11, "sales": 70 },
+    { "month": 12, "sales": 140 },
+    { "month": 13, "sales": 90 },
+    { "month": 14, "sales": 150 },
+    { "month": 15, "sales": 60 },
+    { "month": 16, "sales": 125 },
+    { "month": 17, "sales": 75 },
+    { "month": 18, "sales": 145 },
+    { "month": 19, "sales": 100 },
+    { "month": 20, "sales": 135 },
+    { "month": 21, "sales": 65 },
+    { "month": 22, "sales": 155 },
+    { "month": 23, "sales": 85 },
+    { "month": 24, "sales": 120 }
+  ]
+}
