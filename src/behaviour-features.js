@@ -31,9 +31,7 @@ function calculateCorrelation(first, second) {
     secondVariance += b * b;
   }
 
-  const divisor = Math.sqrt(
-    firstVariance * secondVariance
-  );
+  const divisor = Math.sqrt(firstVariance * secondVariance);
 
   return divisor === 0 ? null : cross / divisor;
 }
@@ -57,7 +55,6 @@ function extractBehaviourFeatures(sales) {
   const zeroRate =
     sales.filter(value => value === 0).length / count;
 
-  // Calculate the overall trend.
   const xMean = (count - 1) / 2;
 
   let numerator = 0;
@@ -68,42 +65,79 @@ function extractBehaviourFeatures(sales) {
     denominator += Math.pow(index - xMean, 2);
   });
 
-  const slope = denominator === 0
+  const monthlySlope = denominator === 0
     ? 0
     : numerator / denominator;
 
-  const relativeTrend = mean === 0
+  let reportedTrend = mean === 0
     ? 0
-    : slope / mean;
+    : monthlySlope / mean;
 
-  let reportedTrend = relativeTrend;
+  let trendSlope = monthlySlope;
 
-  // Use yearly medians to reduce the influence
-  // of occasional unusually large orders.
+  // For longer histories, estimate the trend using
+  // complete yearly averages instead of seasonal peaks
+  // and troughs within individual months.
   if (count >= 24) {
-    const firstMedian = median(sales.slice(0, 12));
-    const lastMedian = median(sales.slice(-12));
+    const yearlyAverages = [];
 
-    const trendBase = (firstMedian + lastMedian) / 2;
+    const completeYears = Math.floor(count / 12);
 
-    const yearlyTrend = trendBase === 0
-      ? 0
-      : (lastMedian - firstMedian) / trendBase;
+    for (let year = 0; year < completeYears; year++) {
+      const yearSales = sales.slice(
+        year * 12,
+        (year + 1) * 12
+      );
 
-    if (Math.abs(yearlyTrend) > 0.02) {
-      reportedTrend = yearlyTrend;
+      const yearlyAverage =
+        yearSales.reduce((sum, value) => sum + value, 0)
+        / 12;
+
+      yearlyAverages.push(yearlyAverage);
     }
+
+    const firstYear = yearlyAverages[0];
+    const lastYear = yearlyAverages[yearlyAverages.length - 1];
+
+    const trendBase = (firstYear + lastYear) / 2;
+
+    reportedTrend = trendBase === 0
+      ? 0
+      : (lastYear - firstYear) / trendBase;
+
+    const yearlyMean =
+      yearlyAverages.reduce((sum, value) => sum + value, 0)
+      / yearlyAverages.length;
+
+    const yearXMean = (yearlyAverages.length - 1) / 2;
+
+    let yearlyNumerator = 0;
+    let yearlyDenominator = 0;
+
+    yearlyAverages.forEach((value, index) => {
+      yearlyNumerator +=
+        (index - yearXMean) * (value - yearlyMean);
+
+      yearlyDenominator +=
+        Math.pow(index - yearXMean, 2);
+    });
+
+    const yearlySlope = yearlyDenominator === 0
+      ? 0
+      : yearlyNumerator / yearlyDenominator;
+
+    trendSlope = yearlySlope / 12;
   }
 
-  // Remove the fitted overall trend.
+  // Remove the estimated underlying trend.
   const detrended = sales.map((value, index) => {
-    const fitted = mean + slope * (index - xMean);
+    const fitted = mean + trendSlope * (index - xMean);
     return value - fitted;
   });
 
-  // Annual seasonality requires at least three
-  // complete years of observations.
   let seasonalCorrelation = null;
+  let halfYearSimilarity = null;
+  let possibleAnnualSeasonality = false;
 
   if (count >= 36) {
     const first = detrended.slice(0, count - 12);
@@ -111,17 +145,53 @@ function extractBehaviourFeatures(sales) {
 
     seasonalCorrelation =
       calculateCorrelation(first, second);
+
+    // Compare the average demand shape in the first
+    // six months with the second six months.
+    const monthlyAverages = Array(12).fill(0);
+
+    for (let month = 0; month < 12; month++) {
+      const values = [];
+
+      for (let i = month; i < count; i += 12) {
+        values.push(detrended[i]);
+      }
+
+      monthlyAverages[month] =
+        values.reduce((sum, value) => sum + value, 0)
+        / values.length;
+    }
+
+    const firstHalf = monthlyAverages.slice(0, 6);
+    const secondHalf = monthlyAverages.slice(6);
+
+    const averageDifference =
+      firstHalf.reduce((sum, value, index) =>
+        sum + Math.abs(value - secondHalf[index]), 0
+      ) / 6;
+
+    const averageMagnitude =
+      monthlyAverages.reduce((sum, value) =>
+        sum + Math.abs(value), 0
+      ) / 12;
+
+    halfYearSimilarity = averageMagnitude === 0
+      ? 0
+      : 1 - Math.min(1, averageDifference / averageMagnitude);
+
+    // A strong twelve-month correlation is not enough.
+    // The two halves must also have different shapes.
+    possibleAnnualSeasonality =
+      seasonalCorrelation !== null &&
+      seasonalCorrelation >= 0.7 &&
+      halfYearSimilarity < 0.9;
   }
 
-  // Only remove a seasonal pattern from volatility
-  // calculations when there is reasonable evidence
-  // that the pattern actually repeats.
+  // Remove a repeating annual pattern from volatility
+  // calculations only when the evidence is sufficient.
   let residuals = detrended.slice();
 
-  if (
-    seasonalCorrelation !== null &&
-    seasonalCorrelation >= 0.7
-  ) {
+  if (possibleAnnualSeasonality) {
     const seasonalAverages = Array(12).fill(0);
 
     for (let month = 0; month < 12; month++) {
@@ -162,7 +232,11 @@ function extractBehaviourFeatures(sales) {
     zeroRate: Number(zeroRate.toFixed(4)),
     seasonalCorrelation: seasonalCorrelation === null
       ? null
-      : Number(seasonalCorrelation.toFixed(4))
+      : Number(seasonalCorrelation.toFixed(4)),
+    halfYearSimilarity: halfYearSimilarity === null
+      ? null
+      : Number(halfYearSimilarity.toFixed(4)),
+    possibleAnnualSeasonality
   };
 }
 
