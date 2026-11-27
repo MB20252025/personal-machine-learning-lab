@@ -23,10 +23,13 @@ const volatile = Array.from(
 );
 
 const scenarios = [
-  { name: "SEASONAL DEMAND", sales: [...seasonal, ...seasonal, ...seasonal] },
+  {
+    name: "SEASONAL DEMAND",
+    sales: [...seasonal, ...seasonal, ...seasonal]
+  },
   { name: "STABLE DEMAND", sales: stable },
   { name: "INTERMITTENT DEMAND", sales: intermittent },
-  { name: "VOLATILE DEMAND", sales: volatile }
+  { name: "REPEATING SIX-MONTH PATTERN", sales: volatile }
 ];
 
 scenarios.forEach(scenario => {
@@ -40,17 +43,15 @@ scenarios.forEach(scenario => {
   const consistency =
     analyseSeasonalConsistency(scenario.sales);
 
-  const average =
-    scenario.sales.reduce((sum, value) => sum + value, 0)
-    / scenario.sales.length;
+  console.log("Classification:", profile.classification);
+  console.log(
+    "Annual seasonality supported:",
+    profile.annualSeasonalitySupported
+  );
+  console.log("Annual correlation:", profile.annualCorrelation);
+  console.log("Six-month similarity:", profile.halfYearSimilarity);
 
-  const zeroMonths =
-    scenario.sales.filter(value => value === 0).length;
-
-  console.log("Average demand:", average.toFixed(2));
-  console.log("Zero-sales months:", zeroMonths);
-
-  console.log("\nSeasonal indices:");
+  console.log("\nMonthly seasonal indices:");
 
   profile.months.forEach(month => {
     console.log(
@@ -69,4 +70,4 @@ scenarios.forEach(scenario => {
   });
 });
 
-console.log("\nALL FOUR DEMAND BEHAVIOUR TESTS COMPLETE");
+console.log("\nALL FOUR TESTS COMPLETE");
