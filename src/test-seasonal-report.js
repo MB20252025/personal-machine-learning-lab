@@ -28,13 +28,20 @@ const graduallyIncreasingSeasonalDemand = [
   ...yearlyDemand.map(value => value * 1.2)
 ];
 
-// Start with gradual growth, then introduce a sudden increase.
 const suddenIncreaseAfterGrowth = [
   ...graduallyIncreasingSeasonalDemand
 ];
 
 suddenIncreaseAfterGrowth[34] = 180;
 suddenIncreaseAfterGrowth[35] = 135;
+
+// Gradual growth followed by a sudden demand collapse.
+const suddenCollapseAfterGrowth = [
+  ...graduallyIncreasingSeasonalDemand
+];
+
+suddenCollapseAfterGrowth[34] = 40;
+suddenCollapseAfterGrowth[35] = 30;
 
 function runTest(name, sales) {
   console.log("\n================================");
@@ -65,10 +72,7 @@ function runTest(name, sales) {
   );
 }
 
-runTest(
-  "Normal seasonal demand",
-  normalSeasonalDemand
-);
+runTest("Normal seasonal demand", normalSeasonalDemand);
 
 runTest(
   "Seasonal demand with recent increase",
@@ -83,4 +87,9 @@ runTest(
 runTest(
   "Sudden increase after gradual growth",
   suddenIncreaseAfterGrowth
+);
+
+runTest(
+  "Sudden collapse after gradual growth",
+  suddenCollapseAfterGrowth
 );
