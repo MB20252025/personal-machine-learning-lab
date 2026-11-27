@@ -13,63 +13,88 @@ function analyseSeasonalProfile(sales) {
     );
   }
 
-  const monthlyData = Array.from(
+  const monthlyIndices = Array.from(
     { length: 12 },
     () => []
   );
 
-  const validSales = sales.filter(value => value !== null);
+  const yearlyProfiles = [];
 
-  if (validSales.length === 0) {
-    throw new Error("No usable sales data available");
-  }
+  const numberOfYears = Math.ceil(sales.length / 12);
 
-  for (let i = 0; i < sales.length; i++) {
-    if (sales[i] !== null) {
-      const monthIndex = i % 12;
-      monthlyData[monthIndex].push(sales[i]);
+  for (let year = 0; year < numberOfYears; year++) {
+    const yearSales = sales.slice(
+      year * 12,
+      (year + 1) * 12
+    );
+
+    const validSales = yearSales.filter(
+      value => value !== null
+    );
+
+    if (validSales.length < 9) {
+      yearlyProfiles.push({
+        year: year + 1,
+        averageDemand: null,
+        usableMonths: validSales.length
+      });
+
+      continue;
     }
+
+    const yearlyAverage =
+      validSales.reduce((sum, value) => sum + value, 0)
+      / validSales.length;
+
+    yearlyProfiles.push({
+      year: year + 1,
+      averageDemand: Number(yearlyAverage.toFixed(2)),
+      usableMonths: validSales.length
+    });
+
+    if (yearlyAverage === 0) {
+      continue;
+    }
+
+    yearSales.forEach((value, monthIndex) => {
+      if (value === null) {
+        return;
+      }
+
+      monthlyIndices[monthIndex].push(
+        value / yearlyAverage
+      );
+    });
   }
 
-  const overallAverage =
-    validSales.reduce((sum, value) => sum + value, 0)
-    / validSales.length;
-
-  const months = monthlyData.map((values, index) => {
+  const months = monthlyIndices.map((values, index) => {
     if (values.length === 0) {
       return {
         month: index + 1,
         observations: 0,
-        averageDemand: null,
-        seasonalIndex: null
+        seasonalIndex: null,
+        averageDemand: null
       };
     }
 
-    const averageDemand =
+    const averageIndex =
       values.reduce((sum, value) => sum + value, 0)
       / values.length;
-
-    const seasonalIndex = overallAverage === 0
-      ? null
-      : averageDemand / overallAverage;
 
     return {
       month: index + 1,
       observations: values.length,
-      averageDemand: Number(averageDemand.toFixed(2)),
-      seasonalIndex: seasonalIndex === null
-        ? null
-        : Number(seasonalIndex.toFixed(3))
+      seasonalIndex: Number(averageIndex.toFixed(3)),
+      averageDemand: Number((averageIndex * 100).toFixed(2))
     };
   });
 
   return {
     observations: sales.length,
-    usableObservations: validSales.length,
-    overallAverageDemand: Number(overallAverage.toFixed(2)),
-    monthsWithData: months.filter(
-      month => month.observations > 0
+    usableObservations: sales.filter(
+      value => value !== null
     ).length,
+    yearlyProfiles,
     months
   };
 }
