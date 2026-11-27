@@ -20,7 +20,8 @@ function analyseSeasonalConsistency(sales) {
 
   const yearlyProfiles = [];
 
-  const numberOfYears = Math.ceil(sales.length / 12);
+  // Only compare complete calendar years.
+  const numberOfYears = Math.floor(sales.length / 12);
 
   for (let year = 0; year < numberOfYears; year++) {
     const yearSales = sales.slice(
@@ -68,7 +69,7 @@ function analyseSeasonalConsistency(sales) {
   }
 
   const months = monthlyIndices.map((values, index) => {
-    if (values.length < 2) {
+    if (values.length < 3) {
       return {
         month: index + 1,
         observations: values.length,
