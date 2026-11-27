@@ -32,31 +32,41 @@ function runTest(name, sales) {
 // TEST 1: Genuine zero sales.
 const zeroSalesDemand = createThreeYears();
 zeroSalesDemand[35] = 0;
-
 runTest("TEST 1: GENUINE ZERO SALES", zeroSalesDemand);
 
 // TEST 2: One missing month.
 const missingMonthDemand = createThreeYears();
 missingMonthDemand[35] = null;
-
 runTest("TEST 2: ONE MISSING MONTH", missingMonthDemand);
 
-// TEST 3: Zero sales in the previous year.
+// TEST 3: Zero previous-year sales.
 const zeroBaselineDemand = createThreeYears();
 zeroBaselineDemand[23] = 0;
-
 runTest("TEST 3: ZERO PREVIOUS-YEAR SALES", zeroBaselineDemand);
 
-// TEST 4: Several missing months.
+// TEST 4: Five missing months.
 const multipleMissingDemand = createThreeYears();
-
-multipleMissingDemand[31] = null;
-multipleMissingDemand[32] = null;
-multipleMissingDemand[33] = null;
-multipleMissingDemand[34] = null;
-multipleMissingDemand[35] = null;
-
+for (let i = 31; i <= 35; i++) {
+  multipleMissingDemand[i] = null;
+}
 runTest("TEST 4: FIVE MISSING MONTHS", multipleMissingDemand);
+
+// TEST 5: Only one usable comparison.
+const oneComparisonDemand = createThreeYears();
+for (let i = 31; i <= 35; i++) {
+  oneComparisonDemand[i] = null;
+}
+oneComparisonDemand[35] = 90;
+runTest("TEST 5: ONE USABLE COMPARISON", oneComparisonDemand);
+
+// TEST 6: Only two usable comparisons.
+const twoComparisonDemand = createThreeYears();
+for (let i = 30; i <= 35; i++) {
+  twoComparisonDemand[i] = null;
+}
+twoComparisonDemand[34] = 80;
+twoComparisonDemand[35] = 90;
+runTest("TEST 6: TWO USABLE COMPARISONS", twoComparisonDemand);
 
 console.log("\n==============================");
 console.log("ALL DATA QUALITY TESTS COMPLETE");
