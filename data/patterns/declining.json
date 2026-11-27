@@ -1,0 +1,20 @@
+
+{
+  "name": "Declining Demand",
+  "pattern": "declining",
+  "description": "Demand steadily decreases over time.",
+  "examples": [
+    { "month": 1, "sales": 150 },
+    { "month": 2, "sales": 142 },
+    { "month": 3, "sales": 135 },
+    { "month": 4, "sales": 128 },
+    { "month": 5, "sales": 120 },
+    { "month": 6, "sales": 112 },
+    { "month": 7, "sales": 105 },
+    { "month": 8, "sales": 98 },
+    { "month": 9, "sales": 90 },
+    { "month": 10, "sales": 82 },
+    { "month": 11, "sales": 75 },
+    { "month": 12, "sales": 68 }
+  ]
+}
