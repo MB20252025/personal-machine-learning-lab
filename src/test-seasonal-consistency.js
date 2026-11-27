@@ -7,21 +7,28 @@ const yearlyDemand = [
   180, 170, 140, 110, 80, 60
 ];
 
-// Test 1: Same seasonal pattern repeated for three years.
+// Same seasonal pattern repeated three times.
 const repeatingSales = [
   ...yearlyDemand,
   ...yearlyDemand,
   ...yearlyDemand
 ];
 
-// Test 2: Stable demand across all three years.
+// Same seasonal pattern, but overall sales grow each year.
+const growingSales = [
+  ...yearlyDemand,
+  ...yearlyDemand.map(value => value * 1.2),
+  ...yearlyDemand.map(value => value * 1.5)
+];
+
+// Stable demand.
 const stableSales = Array(36).fill(100);
 
-// Test 3: One unusual July in the third year.
+// One unusual July in the third year.
 const unusualSales = [...repeatingSales];
 unusualSales[30] = 300;
 
-// Test 4: One missing December observation.
+// One missing December observation.
 const missingSales = [...repeatingSales];
 missingSales[35] = null;
 
@@ -32,19 +39,22 @@ function runTest(name, sales) {
 
   const result = analyseSeasonalConsistency(sales);
 
-  console.log(
-    "Usable observations:",
-    result.usableObservations
-  );
+  console.log("\nYearly averages:");
 
-  console.log("\nMonthly consistency:");
+  result.yearlyProfiles.forEach(year => {
+    console.log(
+      "Year:", year.year,
+      "| Average:", year.averageDemand,
+      "| Usable months:", year.usableMonths
+    );
+  });
+
+  console.log("\nMonthly seasonal consistency:");
 
   result.months.forEach(month => {
     console.log(
       "Month:", month.month,
-      "| Average:", month.averageDemand,
-      "| Lowest:", month.lowestDemand,
-      "| Highest:", month.highestDemand,
+      "| Seasonal index:", month.averageSeasonalIndex,
       "| Variation:", month.variation,
       "| Consistency:", month.consistency
     );
@@ -53,10 +63,12 @@ function runTest(name, sales) {
 
 runTest("TEST 1: REPEATING SEASONAL PATTERN", repeatingSales);
 
-runTest("TEST 2: STABLE DEMAND", stableSales);
+runTest("TEST 2: GROWING SALES, SAME SEASONAL PATTERN", growingSales);
 
-runTest("TEST 3: UNUSUAL JULY", unusualSales);
+runTest("TEST 3: STABLE DEMAND", stableSales);
 
-runTest("TEST 4: MISSING MONTH", missingSales);
+runTest("TEST 4: UNUSUAL JULY", unusualSales);
+
+runTest("TEST 5: MISSING MONTH", missingSales);
 
 console.log("\nALL SEASONAL CONSISTENCY TESTS COMPLETE");
