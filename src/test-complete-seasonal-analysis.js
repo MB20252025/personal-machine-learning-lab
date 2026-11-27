@@ -1,6 +1,5 @@
 
-const completeSeasonalAnalysis =
-  require("./complete-seasonal-analysis");
+const completeSeasonalAnalysis = require("./complete-seasonal-analysis");
 
 const yearlyDemand = [
   50, 60, 80, 100, 130, 160,
@@ -18,9 +17,9 @@ const sales = [
 sales[34] = 180;
 sales[35] = 135;
 
-console.log("\n==============================");
+console.log("================================");
 console.log("COMPLETE SEASONAL ANALYSIS");
-console.log("==============================");
+console.log("================================");
 
 const result = completeSeasonalAnalysis(sales);
 
@@ -77,4 +76,33 @@ console.log(
   result.recentSeasonalChange.validComparisons
 );
 
-console.log("\nCOMPLETE SEASONAL ANALYSIS FINISHED");
+console.log("\n5. SEASONAL PATTERN CHANGE");
+
+console.log(
+  "Classification:",
+  result.seasonalPatternChange.classification
+);
+
+console.log(
+  "Confidence:",
+  result.seasonalPatternChange.confidence
+);
+
+console.log(
+  "Peak shifted:",
+  result.seasonalPatternChange.peakShift
+);
+
+console.log(
+  "Strength change:",
+  result.seasonalPatternChange.strengthChange
+);
+
+console.log(
+  "Usable years:",
+  result.seasonalPatternChange.usableYears
+);
+
+console.log("\n================================");
+console.log("COMPLETE SEASONAL ANALYSIS FINISHED");
+console.log("================================");
