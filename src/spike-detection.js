@@ -24,26 +24,43 @@ function detectSpikes(sales) {
 
   const middle = median(sales);
 
+  const zeroRate =
+    sales.filter(value => value === 0).length / sales.length;
+
   const deviations = sales.map(value =>
     Math.abs(value - middle)
   );
 
   const mad = median(deviations);
 
-  const threshold = middle + (mad * 3);
+  let threshold;
 
-  const spikes = sales
-    .map((value, index) => ({
-      month: index + 1,
-      sales: value
-    }))
-    .filter(item => item.sales > threshold);
+  if (mad === 0) {
+    threshold = middle * 1.5;
+  } else {
+    threshold = middle + (mad * 3);
+  }
+
+  // Intermittent demand needs separate treatment.
+  // Ordinary customer orders should not automatically
+  // be classified as unusual spikes.
+  const isIntermittent = zeroRate >= 0.4;
+
+  const spikes = isIntermittent
+    ? []
+    : sales
+        .map((value, index) => ({
+          month: index + 1,
+          sales: value
+        }))
+        .filter(item => item.sales > threshold);
 
   return {
     medianDemand: middle,
     spikeThreshold: Number(threshold.toFixed(2)),
     spikeCount: spikes.length,
     spikeRate: Number((spikes.length / sales.length).toFixed(4)),
+    intermittent: isIntermittent,
     spikes
   };
 }
