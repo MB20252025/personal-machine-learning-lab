@@ -23,6 +23,7 @@ function runTest(name, sales) {
   const result = detectSeasonalChange(sales);
 
   console.log("Classification:", result.classification);
+  console.log("Confidence:", result.confidence);
   console.log("Valid comparisons:", result.validComparisons);
   console.log("Skipped missing data:", result.skippedMissingData);
   console.log("Skipped zero baseline:", result.skippedZeroBaseline);
@@ -51,7 +52,7 @@ for (let i = 31; i <= 35; i++) {
 }
 runTest("TEST 4: FIVE MISSING MONTHS", multipleMissingDemand);
 
-// TEST 5: Only one usable comparison.
+// TEST 5: One usable comparison.
 const oneComparisonDemand = createThreeYears();
 for (let i = 31; i <= 35; i++) {
   oneComparisonDemand[i] = null;
@@ -59,7 +60,7 @@ for (let i = 31; i <= 35; i++) {
 oneComparisonDemand[35] = 90;
 runTest("TEST 5: ONE USABLE COMPARISON", oneComparisonDemand);
 
-// TEST 6: Only two usable comparisons.
+// TEST 6: Two usable comparisons.
 const twoComparisonDemand = createThreeYears();
 for (let i = 30; i <= 35; i++) {
   twoComparisonDemand[i] = null;
