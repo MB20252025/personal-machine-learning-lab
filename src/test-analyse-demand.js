@@ -49,17 +49,18 @@ const tests = [
   }
 ];
 
-console.log("\nCOMBINED DEMAND ANALYSIS\n");
+console.log("\nSTRICT DEMAND ANALYSIS TEST\n");
 
 let passed = 0;
 
 for (const test of tests) {
   const result = analyseDemand(test.sales);
 
+  const actual = [...result.patterns].sort();
+  const expected = [...test.expected].sort();
+
   const success =
-    test.expected.every(pattern =>
-      result.patterns.includes(pattern)
-    );
+    JSON.stringify(actual) === JSON.stringify(expected);
 
   if (success) passed++;
 
@@ -67,9 +68,8 @@ for (const test of tests) {
     `${success ? "PASS" : "FAIL"}: ${test.name}`
   );
 
-  console.log("Expected:", test.expected);
-  console.log("Recognised:", result.patterns);
-  console.log("Spikes:", result.spikes.spikeCount);
+  console.log("Expected:", expected);
+  console.log("Recognised:", actual);
   console.log("-------------------------");
 }
 
