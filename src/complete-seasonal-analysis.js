@@ -1,25 +1,23 @@
 
-const analyseSeasonalProfile =
-  require("./seasonal-profile");
-
-const analyseSeasonalConsistency =
-  require("./seasonal-consistency");
-
-const detectSeasonalChange =
-  require("./detect-seasonal-change");
+const analyseSeasonalProfile = require("./seasonal-profile");
+const analyseSeasonalConsistency = require("./seasonal-consistency");
+const detectSeasonalChange = require("./detect-seasonal-change");
+const detectSeasonalPatternChange = require("./seasonal-pattern-change");
 
 function completeSeasonalAnalysis(sales) {
   if (!Array.isArray(sales) || sales.length < 36) {
-    throw new Error("At least 36 months of history are required");
+    throw new Error(
+      "At least 36 months of history are required"
+    );
   }
 
   const profile = analyseSeasonalProfile(sales);
 
-  const consistency =
-    analyseSeasonalConsistency(sales);
+  const consistency = analyseSeasonalConsistency(sales);
 
-  const recentChange =
-    detectSeasonalChange(sales);
+  const recentChange = detectSeasonalChange(sales);
+
+  const patternChange = detectSeasonalPatternChange(sales);
 
   return {
     observations: sales.length,
@@ -44,6 +42,16 @@ function completeSeasonalAnalysis(sales) {
       validComparisons: recentChange.validComparisons,
       skippedMissingData: recentChange.skippedMissingData,
       skippedZeroBaseline: recentChange.skippedZeroBaseline
+    },
+
+    seasonalPatternChange: {
+      classification: patternChange.classification,
+      confidence: patternChange.confidence,
+      peakShift: patternChange.peakShift,
+      strengthChange: patternChange.strengthChange,
+      yearsAnalysed: patternChange.yearsAnalysed,
+      usableYears: patternChange.usableYears,
+      yearlyProfiles: patternChange.yearlyProfiles
     }
   };
 }
