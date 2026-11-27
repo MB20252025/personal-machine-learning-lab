@@ -36,31 +36,21 @@ const tests = [
   }
 ];
 
-console.log("\nDEMAND HISTORY ANALYSIS\n");
+console.log("\nDEMAND HISTORY COMPARISON\n");
 
 for (const test of tests) {
-  const result = analyseDemandHistory(test.sales);
-
   console.log("\n" + test.name);
 
-  console.log("Overall patterns:");
-  console.log(result.overall.patterns);
+  const fiveMonths =
+    analyseDemandHistory(test.sales, 5);
 
-  console.log("Recent patterns:");
-  console.log(result.recent.patterns);
+  const sixMonths =
+    analyseDemandHistory(test.sales, 6);
 
-  console.log("Recent months:");
-  console.log(
-    result.recent.startMonth,
-    "to",
-    result.recent.endMonth
-  );
-
-  console.log("Behaviour changed:");
-  console.log(result.change.changed);
-
-  console.log("Recent differs from overall:");
-  console.log(result.recentDiffers);
+  console.log("Overall:", fiveMonths.overall.patterns);
+  console.log("Latest 5 months:", fiveMonths.recent.patterns);
+  console.log("Latest 6 months:", sixMonths.recent.patterns);
+  console.log("Behaviour changed:", fiveMonths.change.changed);
 
   console.log("-------------------------");
 }
