@@ -11,6 +11,33 @@ function median(values) {
   return sorted[middle];
 }
 
+function calculateCorrelation(first, second) {
+  const firstMean =
+    first.reduce((sum, value) => sum + value, 0) / first.length;
+
+  const secondMean =
+    second.reduce((sum, value) => sum + value, 0) / second.length;
+
+  let cross = 0;
+  let firstVariance = 0;
+  let secondVariance = 0;
+
+  for (let i = 0; i < first.length; i++) {
+    const a = first[i] - firstMean;
+    const b = second[i] - secondMean;
+
+    cross += a * b;
+    firstVariance += a * a;
+    secondVariance += b * b;
+  }
+
+  const divisor = Math.sqrt(
+    firstVariance * secondVariance
+  );
+
+  return divisor === 0 ? null : cross / divisor;
+}
+
 function extractBehaviourFeatures(sales) {
   if (!Array.isArray(sales) || sales.length < 3) {
     throw new Error("At least 3 sales observations are required");
@@ -41,47 +68,60 @@ function extractBehaviourFeatures(sales) {
     denominator += Math.pow(index - xMean, 2);
   });
 
-  const slope = numerator / denominator;
+  const slope = denominator === 0
+    ? 0
+    : numerator / denominator;
 
   const relativeTrend = mean === 0
     ? 0
     : slope / mean;
 
-  // For longer histories, compare yearly medians.
+  let reportedTrend = relativeTrend;
+
+  // Use yearly medians to reduce the influence
+  // of occasional unusually large orders.
   if (count >= 24) {
     const firstMedian = median(sales.slice(0, 12));
     const lastMedian = median(sales.slice(-12));
 
     const trendBase = (firstMedian + lastMedian) / 2;
 
-    // Use the robust yearly comparison for trend.
-    // This reduces the influence of occasional spikes.
     const yearlyTrend = trendBase === 0
       ? 0
       : (lastMedian - firstMedian) / trendBase;
 
-    // Retain the regression trend when the median comparison
-    // is inconclusive.
     if (Math.abs(yearlyTrend) > 0.02) {
-      // The yearly trend is used for the reported result.
-      var reportedTrend = yearlyTrend;
-    } else {
-      var reportedTrend = relativeTrend;
+      reportedTrend = yearlyTrend;
     }
-  } else {
-    var reportedTrend = relativeTrend;
   }
 
-  // Remove the fitted trend from each observation.
+  // Remove the fitted overall trend.
   const detrended = sales.map((value, index) => {
     const fitted = mean + slope * (index - xMean);
     return value - fitted;
   });
 
+  // Annual seasonality requires at least three
+  // complete years of observations.
+  let seasonalCorrelation = null;
+
+  if (count >= 36) {
+    const first = detrended.slice(0, count - 12);
+    const second = detrended.slice(12);
+
+    seasonalCorrelation =
+      calculateCorrelation(first, second);
+  }
+
+  // Only remove a seasonal pattern from volatility
+  // calculations when there is reasonable evidence
+  // that the pattern actually repeats.
   let residuals = detrended.slice();
 
-  // Remove repeating monthly patterns as well.
-  if (count >= 24) {
+  if (
+    seasonalCorrelation !== null &&
+    seasonalCorrelation >= 0.7
+  ) {
     const seasonalAverages = Array(12).fill(0);
 
     for (let month = 0; month < 12; month++) {
@@ -113,42 +153,6 @@ function extractBehaviourFeatures(sales) {
   const relativeVolatility = mean === 0
     ? 0
     : Math.sqrt(residualVariance) / mean;
-
-  // Check whether the same 12-month pattern repeats.
-  let seasonalCorrelation = null;
-
-  if (count >= 24) {
-    const first = sales.slice(0, count - 12);
-    const second = sales.slice(12);
-
-    const firstMean =
-      first.reduce((sum, value) => sum + value, 0)
-      / first.length;
-
-    const secondMean =
-      second.reduce((sum, value) => sum + value, 0)
-      / second.length;
-
-    let cross = 0;
-    let firstVariance = 0;
-    let secondVariance = 0;
-
-    for (let i = 0; i < first.length; i++) {
-      const a = first[i] - firstMean;
-      const b = second[i] - secondMean;
-
-      cross += a * b;
-      firstVariance += a * a;
-      secondVariance += b * b;
-    }
-
-    const divisor = Math.sqrt(
-      firstVariance * secondVariance
-    );
-
-    seasonalCorrelation =
-      divisor === 0 ? null : cross / divisor;
-  }
 
   return {
     observations: count,
