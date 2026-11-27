@@ -1,0 +1,32 @@
+
+{
+  "name": "Sudden Demand Change",
+  "pattern": "sudden-change",
+  "description": "Demand is stable before suddenly increasing or decreasing.",
+  "examples": [
+    { "month": 1, "sales": 100 },
+    { "month": 2, "sales": 102 },
+    { "month": 3, "sales": 98 },
+    { "month": 4, "sales": 101 },
+    { "month": 5, "sales": 99 },
+    { "month": 6, "sales": 100 },
+    { "month": 7, "sales": 150 },
+    { "month": 8, "sales": 155 },
+    { "month": 9, "sales": 148 },
+    { "month": 10, "sales": 152 },
+    { "month": 11, "sales": 158 },
+    { "month": 12, "sales": 150 },
+    { "month": 13, "sales": 145 },
+    { "month": 14, "sales": 140 },
+    { "month": 15, "sales": 95 },
+    { "month": 16, "sales": 92 },
+    { "month": 17, "sales": 90 },
+    { "month": 18, "sales": 94 },
+    { "month": 19, "sales": 91 },
+    { "month": 20, "sales": 89 },
+    { "month": 21, "sales": 93 },
+    { "month": 22, "sales": 90 },
+    { "month": 23, "sales": 92 },
+    { "month": 24, "sales": 90 }
+  ]
+}
