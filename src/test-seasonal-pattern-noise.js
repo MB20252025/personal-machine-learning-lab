@@ -26,9 +26,15 @@ function runTest(name, sales) {
 
   console.log("\n" + name);
   console.log("Classification:", result.classification);
-  console.log("Confidence:", result.confidence);
   console.log("Strength change:", result.strengthChange);
-  console.log("Peak shifted:", result.peakShift);
+
+  result.yearlyProfiles.forEach(profile => {
+    console.log(
+      "Year:", profile.year,
+      "| Seasonal range:", profile.seasonalRange,
+      "| Has seasonality:", profile.hasSeasonality
+    );
+  });
 }
 
 const stableSeasonality = [
@@ -57,4 +63,4 @@ runTest("NOISY INCREASING SEASONALITY", increasingSeasonality);
 
 runTest("NOISY DISAPPEARING SEASONALITY", disappearingSeasonality);
 
-console.log("\nALL REPEATABLE NOISY TESTS COMPLETE");
+console.log("\nSEASONAL STRENGTH MEASUREMENTS COMPLETE");
