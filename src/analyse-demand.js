@@ -13,12 +13,10 @@ function analyseDemand(sales) {
 
   const isIntermittent = features.zeroRate >= 0.4;
 
-  // Intermittent demand takes priority because
-  // zero-demand months are normal for this behaviour.
   if (isIntermittent) {
     patterns.push("intermittent");
   } else {
-    // Underlying direction
+    // Identify the underlying demand direction.
     if (features.relativeTrend > 0.02) {
       patterns.push("increasing");
     } else if (features.relativeTrend < -0.02) {
@@ -27,22 +25,21 @@ function analyseDemand(sales) {
       patterns.push("stable");
     }
 
-    // Seasonality is only considered when there
-    // is enough evidence of a repeating pattern.
+    // Seasonality can exist alongside an upward
+    // or downward trend, so do not exclude it.
     if (
       features.seasonalCorrelation !== null &&
-      features.seasonalCorrelation >= 0.7 &&
-      Math.abs(features.relativeTrend) < 0.02
+      features.seasonalCorrelation >= 0.7
     ) {
       patterns.push("possible-seasonality");
     }
 
-    // Individual unusually large orders
+    // Identify unusually large individual orders.
     if (spikeResults.spikeCount > 0) {
       patterns.push("spiky");
     }
 
-    // Irregular variation, excluding identified spikes
+    // Identify irregular variation.
     if (
       features.relativeVolatility > 0.15 &&
       spikeResults.spikeCount === 0 &&
