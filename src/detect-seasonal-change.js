@@ -23,33 +23,21 @@ function detectSeasonalChange(sales, recentWindowSize = 5) {
 
   for (let i = 0; i < recentWindowSize; i++) {
     const currentIndex = recentStart + i;
-    const currentMonth = currentIndex % 12;
-    const previousValues = [];
+    const previousYearIndex = currentIndex - 12;
 
-    for (
-      let previousIndex = currentMonth;
-      previousIndex < currentIndex;
-      previousIndex += 12
-    ) {
-      previousValues.push(sales[previousIndex]);
-    }
-
-    if (previousValues.length === 0) continue;
-
-    const previousAverage =
-      previousValues.reduce((sum, value) => sum + value, 0)
-      / previousValues.length;
+    if (previousYearIndex < 0) continue;
 
     const currentValue = sales[currentIndex];
+    const previousValue = sales[previousYearIndex];
 
-    const percentageChange = previousAverage === 0
+    const percentageChange = previousValue === 0
       ? null
-      : ((currentValue - previousAverage) / previousAverage) * 100;
+      : ((currentValue - previousValue) / previousValue) * 100;
 
     comparisons.push({
       month: currentIndex + 1,
       currentValue,
-      previousAverage: Number(previousAverage.toFixed(2)),
+      previousYearValue: previousValue,
       percentageChange: percentageChange === null
         ? null
         : Number(percentageChange.toFixed(2))
