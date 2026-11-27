@@ -1,0 +1,10 @@
+
+{
+  "experiment": "Sudden change in sales pattern",
+  "examples": [
+    {"month": 9, "sales": 145},
+    {"month": 10, "sales": 135},
+    {"month": 11, "sales": 125},
+    {"month": 12, "sales": 115}
+  ]
+}
