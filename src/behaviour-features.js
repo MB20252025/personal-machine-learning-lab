@@ -30,41 +30,57 @@ function extractBehaviourFeatures(sales) {
   const zeroRate =
     sales.filter(value => value === 0).length / count;
 
-  // Measure the underlying trend.
-  let relativeTrend;
+  // Calculate the overall trend.
+  const xMean = (count - 1) / 2;
 
+  let numerator = 0;
+  let denominator = 0;
+
+  sales.forEach((value, index) => {
+    numerator += (index - xMean) * (value - mean);
+    denominator += Math.pow(index - xMean, 2);
+  });
+
+  const slope = numerator / denominator;
+
+  const relativeTrend = mean === 0
+    ? 0
+    : slope / mean;
+
+  // For longer histories, compare yearly medians.
   if (count >= 24) {
-    const firstYear = sales.slice(0, 12);
-    const lastYear = sales.slice(-12);
-
-    const firstMedian = median(firstYear);
-    const lastMedian = median(lastYear);
+    const firstMedian = median(sales.slice(0, 12));
+    const lastMedian = median(sales.slice(-12));
 
     const trendBase = (firstMedian + lastMedian) / 2;
 
-    relativeTrend = trendBase === 0
+    // Use the robust yearly comparison for trend.
+    // This reduces the influence of occasional spikes.
+    const yearlyTrend = trendBase === 0
       ? 0
       : (lastMedian - firstMedian) / trendBase;
+
+    // Retain the regression trend when the median comparison
+    // is inconclusive.
+    if (Math.abs(yearlyTrend) > 0.02) {
+      // The yearly trend is used for the reported result.
+      var reportedTrend = yearlyTrend;
+    } else {
+      var reportedTrend = relativeTrend;
+    }
   } else {
-    const xMean = (count - 1) / 2;
-
-    let numerator = 0;
-    let denominator = 0;
-
-    sales.forEach((value, index) => {
-      numerator += (index - xMean) * (value - mean);
-      denominator += Math.pow(index - xMean, 2);
-    });
-
-    const slope = numerator / denominator;
-
-    relativeTrend = mean === 0 ? 0 : slope / mean;
+    var reportedTrend = relativeTrend;
   }
 
-  // Remove average monthly patterns to measure
-  // irregular variation rather than regular seasonality.
-  let residuals = sales.slice();
+  // Remove the fitted trend from each observation.
+  const detrended = sales.map((value, index) => {
+    const fitted = mean + slope * (index - xMean);
+    return value - fitted;
+  });
 
+  let residuals = detrended.slice();
+
+  // Remove repeating monthly patterns as well.
   if (count >= 24) {
     const seasonalAverages = Array(12).fill(0);
 
@@ -72,7 +88,7 @@ function extractBehaviourFeatures(sales) {
       const values = [];
 
       for (let i = month; i < count; i += 12) {
-        values.push(sales[i]);
+        values.push(detrended[i]);
       }
 
       seasonalAverages[month] =
@@ -80,7 +96,7 @@ function extractBehaviourFeatures(sales) {
         / values.length;
     }
 
-    residuals = sales.map((value, index) =>
+    residuals = detrended.map((value, index) =>
       value - seasonalAverages[index % 12]
     );
   }
@@ -106,10 +122,12 @@ function extractBehaviourFeatures(sales) {
     const second = sales.slice(12);
 
     const firstMean =
-      first.reduce((sum, value) => sum + value, 0) / first.length;
+      first.reduce((sum, value) => sum + value, 0)
+      / first.length;
 
     const secondMean =
-      second.reduce((sum, value) => sum + value, 0) / second.length;
+      second.reduce((sum, value) => sum + value, 0)
+      / second.length;
 
     let cross = 0;
     let firstVariance = 0;
@@ -124,7 +142,9 @@ function extractBehaviourFeatures(sales) {
       secondVariance += b * b;
     }
 
-    const divisor = Math.sqrt(firstVariance * secondVariance);
+    const divisor = Math.sqrt(
+      firstVariance * secondVariance
+    );
 
     seasonalCorrelation =
       divisor === 0 ? null : cross / divisor;
@@ -133,7 +153,7 @@ function extractBehaviourFeatures(sales) {
   return {
     observations: count,
     averageDemand: Number(mean.toFixed(2)),
-    relativeTrend: Number(relativeTrend.toFixed(4)),
+    relativeTrend: Number(reportedTrend.toFixed(4)),
     relativeVolatility: Number(relativeVolatility.toFixed(4)),
     zeroRate: Number(zeroRate.toFixed(4)),
     seasonalCorrelation: seasonalCorrelation === null
