@@ -25,6 +25,9 @@ function analyseYear(sales) {
   );
 
   const peak = Math.max(...validIndices);
+  const trough = Math.min(...validIndices);
+
+  const seasonalRange = peak - trough;
 
   const peakMonths = indices
     .map((value, index) => ({
@@ -37,11 +40,16 @@ function analyseYear(sales) {
     )
     .map(item => item.month);
 
+  const hasSeasonality = seasonalRange >= 0.2;
+
   return {
     averageDemand: Number(average.toFixed(2)),
     indices,
     peakIndex: Number(peak.toFixed(3)),
-    peakMonths
+    troughIndex: Number(trough.toFixed(3)),
+    seasonalRange: Number(seasonalRange.toFixed(3)),
+    hasSeasonality,
+    peakMonths: hasSeasonality ? peakMonths : []
   };
 }
 
@@ -79,6 +87,9 @@ function detectSeasonalPatternChange(sales) {
           averageDemand: null,
           indices: null,
           peakIndex: null,
+          troughIndex: null,
+          seasonalRange: null,
+          hasSeasonality: false,
           peakMonths: []
         }
       )
@@ -91,7 +102,6 @@ function detectSeasonalPatternChange(sales) {
 
   let classification = "insufficient-evidence";
   let confidence = "insufficient";
-
   let peakShift = false;
   let strengthChange = null;
 
@@ -99,39 +109,31 @@ function detectSeasonalPatternChange(sales) {
     const first = usableProfiles[0];
     const latest = usableProfiles[usableProfiles.length - 1];
 
-    const firstPeak = first.peakMonths[0];
-    const latestPeak = latest.peakMonths[0];
-
-    peakShift = firstPeak !== latestPeak;
-
     strengthChange = Number(
-      (latest.peakIndex - first.peakIndex).toFixed(3)
+      (latest.seasonalRange - first.seasonalRange).toFixed(3)
     );
 
-    const firstRange = Math.max(
-      ...first.indices.filter(value => value !== null)
-    ) - Math.min(
-      ...first.indices.filter(value => value !== null)
-    );
-
-    const latestRange = Math.max(
-      ...latest.indices.filter(value => value !== null)
-    ) - Math.min(
-      ...latest.indices.filter(value => value !== null)
-    );
-
-    if (peakShift) {
-      classification = "seasonal-peak-shifted";
-    } else if (strengthChange >= 0.2) {
-      classification = "seasonal-strength-increasing";
-    } else if (strengthChange <= -0.2) {
-      classification = "seasonal-strength-decreasing";
-    } else if (firstRange <= 0.2 && latestRange >= 0.4) {
+    if (!first.hasSeasonality && latest.hasSeasonality) {
       classification = "seasonality-emerging";
-    } else if (firstRange >= 0.4 && latestRange <= 0.2) {
+    } else if (first.hasSeasonality && !latest.hasSeasonality) {
       classification = "seasonality-disappearing";
-    } else {
+    } else if (!first.hasSeasonality && !latest.hasSeasonality) {
       classification = "no-clear-seasonal-change";
+    } else {
+      const firstPeak = first.peakMonths[0];
+      const latestPeak = latest.peakMonths[0];
+
+      peakShift = firstPeak !== latestPeak;
+
+      if (peakShift) {
+        classification = "seasonal-peak-shifted";
+      } else if (strengthChange >= 0.2) {
+        classification = "seasonal-strength-increasing";
+      } else if (strengthChange <= -0.2) {
+        classification = "seasonal-strength-decreasing";
+      } else {
+        classification = "no-clear-seasonal-change";
+      }
     }
 
     confidence = usableProfiles.length >= 4
