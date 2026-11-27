@@ -1,0 +1,14 @@
+
+{
+  "experiment": "Noisy sales data",
+  "examples": [
+    {"month": 1, "sales": 105},
+    {"month": 2, "sales": 112},
+    {"month": 3, "sales": 118},
+    {"month": 4, "sales": 135},
+    {"month": 5, "sales": 139},
+    {"month": 6, "sales": 153},
+    {"month": 7, "sales": 158},
+    {"month": 8, "sales": 174}
+  ]
+}
