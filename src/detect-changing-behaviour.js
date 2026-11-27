@@ -2,8 +2,11 @@
 const recogniseBehaviour =
   require("./recognise-behaviour");
 
-function detectChangingBehaviour(sales, windowSize = 6) {
-  if (!Array.isArray(sales) || sales.length < windowSize * 2) {
+function detectChangingBehaviour(sales, windowSize = 4, stepSize = 2) {
+  if (
+    !Array.isArray(sales) ||
+    sales.length < windowSize * 2
+  ) {
     throw new Error("Not enough data to compare behaviour");
   }
 
@@ -12,7 +15,7 @@ function detectChangingBehaviour(sales, windowSize = 6) {
   for (
     let start = 0;
     start + windowSize <= sales.length;
-    start += windowSize
+    start += stepSize
   ) {
     const periodSales = sales.slice(
       start,
