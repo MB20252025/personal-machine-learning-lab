@@ -14,10 +14,10 @@ const zeroSalesDemand = [
   ...yearlyDemand
 ];
 
-// Record genuine zero sales in the latest month.
+// A genuine zero sale in the latest month.
 zeroSalesDemand[35] = 0;
 
-// Create a separate dataset with a missing month.
+// A separate dataset with a missing latest month.
 const missingMonthDemand = [
   ...yearlyDemand,
   ...yearlyDemand,
@@ -31,27 +31,28 @@ console.log("\n==============================");
 console.log("TEST 1: GENUINE ZERO SALES");
 console.log("==============================");
 
-try {
-  const zeroResult =
-    detectSeasonalChange(zeroSalesDemand);
+const zeroResult =
+  detectSeasonalChange(zeroSalesDemand);
 
-  console.log("Classification:", zeroResult.classification);
-  console.log("Average change:", zeroResult.averageChange);
-  console.log("Largest decrease:", zeroResult.largestDecrease);
-  console.log("Latest month:", zeroResult.comparisons.slice(-1));
-} catch (error) {
-  console.log("Error:", error.message);
-}
+console.log("Classification:", zeroResult.classification);
+console.log("Average change:", zeroResult.averageChange);
+console.log("Largest decrease:", zeroResult.largestDecrease);
+console.log("Valid comparisons:", zeroResult.validComparisons);
+console.log("Skipped comparisons:", zeroResult.skippedComparisons);
+console.log("Latest comparison:", zeroResult.comparisons.slice(-1));
 
 console.log("\n==============================");
 console.log("TEST 2: MISSING MONTH");
 console.log("==============================");
 
-try {
-  const missingResult =
-    detectSeasonalChange(missingMonthDemand);
+const missingResult =
+  detectSeasonalChange(missingMonthDemand);
 
-  console.log("Classification:", missingResult.classification);
-} catch (error) {
-  console.log("Missing data rejected:", error.message);
-}
+console.log("Classification:", missingResult.classification);
+console.log("Valid comparisons:", missingResult.validComparisons);
+console.log("Skipped comparisons:", missingResult.skippedComparisons);
+console.log("Latest comparisons:", missingResult.comparisons.slice(-2));
+
+console.log("\n==============================");
+console.log("DATA QUALITY TESTS COMPLETE");
+console.log("==============================");
