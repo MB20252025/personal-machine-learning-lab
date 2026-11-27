@@ -22,15 +22,17 @@ function detectSeasonalChange(sales, recentWindowSize = 5) {
   }
 
   const recentStart = sales.length - recentWindowSize;
+
   const comparisons = [];
-  let skippedComparisons = 0;
+  let skippedMissingData = 0;
+  let skippedZeroBaseline = 0;
 
   for (let i = 0; i < recentWindowSize; i++) {
     const currentIndex = recentStart + i;
     const previousYearIndex = currentIndex - 12;
 
     if (previousYearIndex < 0) {
-      skippedComparisons++;
+      skippedMissingData++;
       continue;
     }
 
@@ -41,21 +43,33 @@ function detectSeasonalChange(sales, recentWindowSize = 5) {
       currentValue === null ||
       previousValue === null
     ) {
-      skippedComparisons++;
+      skippedMissingData++;
       continue;
     }
 
-    const percentageChange = previousValue === 0
-      ? null
-      : ((currentValue - previousValue) / previousValue) * 100;
+    if (previousValue === 0) {
+      skippedZeroBaseline++;
+
+      comparisons.push({
+        month: currentIndex + 1,
+        currentValue,
+        previousYearValue: previousValue,
+        percentageChange: null,
+        reason: "zero-previous-year-sales"
+      });
+
+      continue;
+    }
+
+    const percentageChange =
+      ((currentValue - previousValue) / previousValue) * 100;
 
     comparisons.push({
       month: currentIndex + 1,
       currentValue,
       previousYearValue: previousValue,
-      percentageChange: percentageChange === null
-        ? null
-        : Number(percentageChange.toFixed(2))
+      percentageChange: Number(percentageChange.toFixed(2)),
+      reason: null
     });
   }
 
@@ -97,8 +111,10 @@ function detectSeasonalChange(sales, recentWindowSize = 5) {
   return {
     observations: sales.length,
     recentWindowSize,
-    validComparisons: comparisons.length,
-    skippedComparisons,
+
+    validComparisons: validChanges.length,
+    skippedMissingData,
+    skippedZeroBaseline,
 
     averageChange: averageChange === null
       ? null
