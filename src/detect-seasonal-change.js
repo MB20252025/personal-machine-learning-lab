@@ -77,22 +77,29 @@ function detectSeasonalChange(sales, recentWindowSize = 5) {
     .filter(item => item.percentageChange !== null)
     .map(item => item.percentageChange);
 
-  const averageChange = validChanges.length === 0
+  const validComparisons = validChanges.length;
+
+  const averageChange = validComparisons === 0
     ? null
     : validChanges.reduce((sum, value) => sum + value, 0)
-      / validChanges.length;
+      / validComparisons;
 
-  const largestIncrease = validChanges.length === 0
+  const largestIncrease = validComparisons === 0
     ? null
     : Math.max(...validChanges);
 
-  const largestDecrease = validChanges.length === 0
+  const largestDecrease = validComparisons === 0
     ? null
     : Math.min(...validChanges);
 
   let classification = "insufficient-comparison";
+  let confidence = "insufficient";
 
-  if (averageChange !== null) {
+  if (validComparisons >= 3) {
+    confidence = validComparisons < 5
+      ? "limited"
+      : "normal";
+
     if (
       averageChange >= 30 ||
       largestIncrease >= 50
@@ -112,7 +119,7 @@ function detectSeasonalChange(sales, recentWindowSize = 5) {
     observations: sales.length,
     recentWindowSize,
 
-    validComparisons: validChanges.length,
+    validComparisons,
     skippedMissingData,
     skippedZeroBaseline,
 
@@ -122,7 +129,10 @@ function detectSeasonalChange(sales, recentWindowSize = 5) {
 
     largestIncrease,
     largestDecrease,
+
     classification,
+    confidence,
+
     comparisons
   };
 }
