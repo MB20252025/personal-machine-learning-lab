@@ -13,35 +13,61 @@ function analyseSeasonalConsistency(sales) {
     );
   }
 
-  const monthlyValues = Array.from(
-    { length: 12 },
-    () => []
-  );
+  const numberOfYears = Math.ceil(sales.length / 12);
+  const yearlyProfiles = [];
 
-  for (let i = 0; i < sales.length; i++) {
-    if (sales[i] !== null) {
-      monthlyValues[i % 12].push(sales[i]);
+  for (let year = 0; year < numberOfYears; year++) {
+    const yearSales = sales.slice(year * 12, (year + 1) * 12);
+    const validSales = yearSales.filter(value => value !== null);
+
+    if (validSales.length < 9) {
+      yearlyProfiles.push({
+        year: year + 1,
+        usableMonths: validSales.length,
+        averageDemand: null,
+        monthlyIndices: Array(12).fill(null)
+      });
+
+      continue;
     }
+
+    const yearlyAverage =
+      validSales.reduce((sum, value) => sum + value, 0)
+      / validSales.length;
+
+    const monthlyIndices = yearSales.map(value => {
+      if (value === null || yearlyAverage === 0) {
+        return null;
+      }
+
+      return Number((value / yearlyAverage).toFixed(3));
+    });
+
+    yearlyProfiles.push({
+      year: year + 1,
+      usableMonths: validSales.length,
+      averageDemand: Number(yearlyAverage.toFixed(2)),
+      monthlyIndices
+    });
   }
 
-  const allValidSales = sales.filter(value => value !== null);
+  const months = [];
 
-  const overallAverage = allValidSales.length === 0
-    ? 0
-    : allValidSales.reduce((sum, value) => sum + value, 0)
-      / allValidSales.length;
+  for (let month = 0; month < 12; month++) {
+    const values = yearlyProfiles
+      .map(year => year.monthlyIndices[month])
+      .filter(value => value !== null);
 
-  const months = monthlyValues.map((values, index) => {
     if (values.length < 2) {
-      return {
-        month: index + 1,
+      months.push({
+        month: month + 1,
         observations: values.length,
-        averageDemand: null,
-        lowestDemand: null,
-        highestDemand: null,
+        averageSeasonalIndex: null,
         variation: null,
         consistency: "insufficient-data"
-      };
+      });
+
+      continue;
     }
 
     const average =
@@ -63,23 +89,20 @@ function analyseSeasonalConsistency(sales) {
       consistency = "moderate";
     }
 
-    return {
-      month: index + 1,
+    months.push({
+      month: month + 1,
       observations: values.length,
-      averageDemand: Number(average.toFixed(2)),
-      lowestDemand: lowest,
-      highestDemand: highest,
+      averageSeasonalIndex: Number(average.toFixed(3)),
       variation: variation === null
         ? null
         : Number(variation.toFixed(2)),
       consistency
-    };
-  });
+    });
+  }
 
   return {
     observations: sales.length,
-    usableObservations: allValidSales.length,
-    overallAverageDemand: Number(overallAverage.toFixed(2)),
+    yearlyProfiles,
     months
   };
 }
