@@ -1,15 +1,25 @@
 const detectSeasonalPatternChange = require("./seasonal-pattern-change");
 
-function createSeasonalYear(noise = 0) {
+function createSeasonalYear(noiseValues = []) {
   const pattern = [
     50, 60, 70, 80, 100, 140,
     180, 160, 130, 100, 80, 60
   ];
 
-  return pattern.map(value =>
-    Math.max(0, value + (Math.random() * noise * 2 - noise))
+  return pattern.map((value, index) =>
+    Math.max(0, value + (noiseValues[index] || 0))
   );
 }
+
+const noiseA = [
+  3, -2, 4, -3, 2, -4,
+  3, -2, 4, -3, 2, -4
+];
+
+const noiseB = [
+  -3, 2, -4, 3, -2, 4,
+  -3, 2, -4, 3, -2, 4
+];
 
 function runTest(name, sales) {
   const result = detectSeasonalPatternChange(sales);
@@ -22,20 +32,22 @@ function runTest(name, sales) {
 }
 
 const stableSeasonality = [
-  ...createSeasonalYear(5),
-  ...createSeasonalYear(5),
-  ...createSeasonalYear(5)
+  ...createSeasonalYear(noiseA),
+  ...createSeasonalYear(noiseB),
+  ...createSeasonalYear(noiseA)
 ];
 
 const increasingSeasonality = [
-  ...createSeasonalYear(5),
-  ...createSeasonalYear(5),
-  ...createSeasonalYear(20)
+  ...createSeasonalYear(noiseA),
+  ...createSeasonalYear(noiseB),
+  ...createSeasonalYear(
+    noiseA.map(value => value * 3)
+  )
 ];
 
 const disappearingSeasonality = [
-  ...createSeasonalYear(5),
-  ...createSeasonalYear(5),
+  ...createSeasonalYear(noiseA),
+  ...createSeasonalYear(noiseB),
   ...Array(12).fill(100)
 ];
 
@@ -45,4 +57,4 @@ runTest("NOISY INCREASING SEASONALITY", increasingSeasonality);
 
 runTest("NOISY DISAPPEARING SEASONALITY", disappearingSeasonality);
 
-console.log("\nALL NOISY SEASONAL TESTS COMPLETE");
+console.log("\nALL REPEATABLE NOISY TESTS COMPLETE");
