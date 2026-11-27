@@ -36,6 +36,9 @@ for (let i = 0; i < iterations; i++) {
   bias -= learningRate * biasError;
 }
 
+// Create the models folder if it doesn't exist
+fs.mkdirSync("models", { recursive: true });
+
 // Save what the machine has learned
 const model = {
   weight,
