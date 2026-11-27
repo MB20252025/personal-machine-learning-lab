@@ -26,6 +26,7 @@ function completeSeasonalAnalysis(sales) {
 
     seasonalProfile: {
       overallAverageDemand: profile.overallAverageDemand,
+      yearlyProfiles: profile.yearlyProfiles,
       months: profile.months
     },
 
