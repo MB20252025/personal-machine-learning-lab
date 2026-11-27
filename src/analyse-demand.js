@@ -25,12 +25,8 @@ function analyseDemand(sales) {
       patterns.push("stable");
     }
 
-    // Seasonality can exist alongside an upward
-    // or downward trend, so do not exclude it.
-    if (
-      features.seasonalCorrelation !== null &&
-      features.seasonalCorrelation >= 0.7
-    ) {
+    // Use the improved annual seasonality assessment.
+    if (features.possibleAnnualSeasonality) {
       patterns.push("possible-seasonality");
     }
 
@@ -43,7 +39,7 @@ function analyseDemand(sales) {
     if (
       features.relativeVolatility > 0.15 &&
       spikeResults.spikeCount === 0 &&
-      !patterns.includes("possible-seasonality")
+      !features.possibleAnnualSeasonality
     ) {
       patterns.push("volatile");
     }
