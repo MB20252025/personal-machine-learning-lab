@@ -1,4 +1,16 @@
 
+function median(values) {
+  const sorted = [...values].sort((a, b) => a - b);
+
+  const middle = Math.floor(sorted.length / 2);
+
+  if (sorted.length % 2 === 0) {
+    return (sorted[middle - 1] + sorted[middle]) / 2;
+  }
+
+  return sorted[middle];
+}
+
 function extractBehaviourFeatures(sales) {
   if (!Array.isArray(sales) || sales.length < 3) {
     throw new Error("At least 3 sales observations are required");
@@ -25,15 +37,14 @@ function extractBehaviourFeatures(sales) {
     const firstYear = sales.slice(0, 12);
     const lastYear = sales.slice(-12);
 
-    const firstAverage =
-      firstYear.reduce((sum, value) => sum + value, 0) / 12;
+    const firstMedian = median(firstYear);
+    const lastMedian = median(lastYear);
 
-    const lastAverage =
-      lastYear.reduce((sum, value) => sum + value, 0) / 12;
+    const trendBase = (firstMedian + lastMedian) / 2;
 
-    relativeTrend = mean === 0
+    relativeTrend = trendBase === 0
       ? 0
-      : (lastAverage - firstAverage) / mean;
+      : (lastMedian - firstMedian) / trendBase;
   } else {
     const xMean = (count - 1) / 2;
 
@@ -50,7 +61,7 @@ function extractBehaviourFeatures(sales) {
     relativeTrend = mean === 0 ? 0 : slope / mean;
   }
 
-  // Remove the average for each month to measure
+  // Remove average monthly patterns to measure
   // irregular variation rather than regular seasonality.
   let residuals = sales.slice();
 
