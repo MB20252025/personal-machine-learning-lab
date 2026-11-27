@@ -7,25 +7,25 @@ const yearlyDemand = [
   180, 170, 140, 110, 80, 60
 ];
 
-// Three years of normal seasonal demand.
-const zeroSalesDemand = [
-  ...yearlyDemand,
-  ...yearlyDemand,
-  ...yearlyDemand
-];
+function createThreeYears() {
+  return [
+    ...yearlyDemand,
+    ...yearlyDemand,
+    ...yearlyDemand
+  ];
+}
 
-// A genuine zero sale in the latest month.
+// TEST 1: Genuine zero sales in the latest month.
+const zeroSalesDemand = createThreeYears();
 zeroSalesDemand[35] = 0;
 
-// A separate dataset with a missing latest month.
-const missingMonthDemand = [
-  ...yearlyDemand,
-  ...yearlyDemand,
-  ...yearlyDemand
-];
-
-// Missing data is represented by null.
+// TEST 2: Missing data in the latest month.
+const missingMonthDemand = createThreeYears();
 missingMonthDemand[35] = null;
+
+// TEST 3: Previous year's matching month had zero sales.
+const zeroBaselineDemand = createThreeYears();
+zeroBaselineDemand[23] = 0;
 
 console.log("\n==============================");
 console.log("TEST 1: GENUINE ZERO SALES");
@@ -35,10 +35,9 @@ const zeroResult =
   detectSeasonalChange(zeroSalesDemand);
 
 console.log("Classification:", zeroResult.classification);
-console.log("Average change:", zeroResult.averageChange);
-console.log("Largest decrease:", zeroResult.largestDecrease);
 console.log("Valid comparisons:", zeroResult.validComparisons);
-console.log("Skipped comparisons:", zeroResult.skippedComparisons);
+console.log("Skipped missing data:", zeroResult.skippedMissingData);
+console.log("Skipped zero baseline:", zeroResult.skippedZeroBaseline);
 console.log("Latest comparison:", zeroResult.comparisons.slice(-1));
 
 console.log("\n==============================");
@@ -50,8 +49,21 @@ const missingResult =
 
 console.log("Classification:", missingResult.classification);
 console.log("Valid comparisons:", missingResult.validComparisons);
-console.log("Skipped comparisons:", missingResult.skippedComparisons);
-console.log("Latest comparisons:", missingResult.comparisons.slice(-2));
+console.log("Skipped missing data:", missingResult.skippedMissingData);
+console.log("Skipped zero baseline:", missingResult.skippedZeroBaseline);
+
+console.log("\n==============================");
+console.log("TEST 3: ZERO PREVIOUS-YEAR SALES");
+console.log("==============================");
+
+const baselineResult =
+  detectSeasonalChange(zeroBaselineDemand);
+
+console.log("Classification:", baselineResult.classification);
+console.log("Valid comparisons:", baselineResult.validComparisons);
+console.log("Skipped missing data:", baselineResult.skippedMissingData);
+console.log("Skipped zero baseline:", baselineResult.skippedZeroBaseline);
+console.log("Latest comparison:", baselineResult.comparisons.slice(-1));
 
 console.log("\n==============================");
 console.log("DATA QUALITY TESTS COMPLETE");
