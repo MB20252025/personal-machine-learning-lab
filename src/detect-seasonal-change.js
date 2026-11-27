@@ -19,14 +19,11 @@ function detectSeasonalChange(sales, recentWindowSize = 5) {
   }
 
   const recentStart = sales.length - recentWindowSize;
-
   const comparisons = [];
 
   for (let i = 0; i < recentWindowSize; i++) {
     const currentIndex = recentStart + i;
-
     const currentMonth = currentIndex % 12;
-
     const previousValues = [];
 
     for (
@@ -37,9 +34,7 @@ function detectSeasonalChange(sales, recentWindowSize = 5) {
       previousValues.push(sales[previousIndex]);
     }
 
-    if (previousValues.length === 0) {
-      continue;
-    }
+    if (previousValues.length === 0) continue;
 
     const previousAverage =
       previousValues.reduce((sum, value) => sum + value, 0)
@@ -70,12 +65,26 @@ function detectSeasonalChange(sales, recentWindowSize = 5) {
     : validChanges.reduce((sum, value) => sum + value, 0)
       / validChanges.length;
 
+  const largestIncrease = validChanges.length === 0
+    ? null
+    : Math.max(...validChanges);
+
+  const largestDecrease = validChanges.length === 0
+    ? null
+    : Math.min(...validChanges);
+
   let classification = "insufficient-comparison";
 
   if (averageChange !== null) {
-    if (averageChange >= 30) {
+    if (
+      averageChange >= 30 ||
+      largestIncrease >= 50
+    ) {
       classification = "above-seasonal-level";
-    } else if (averageChange <= -30) {
+    } else if (
+      averageChange <= -30 ||
+      largestDecrease <= -50
+    ) {
       classification = "below-seasonal-level";
     } else {
       classification = "within-seasonal-range";
@@ -85,9 +94,14 @@ function detectSeasonalChange(sales, recentWindowSize = 5) {
   return {
     observations: sales.length,
     recentWindowSize,
+
     averageChange: averageChange === null
       ? null
       : Number(averageChange.toFixed(2)),
+
+    largestIncrease,
+    largestDecrease,
+
     classification,
     comparisons
   };
