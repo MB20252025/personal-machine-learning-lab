@@ -1,10 +1,29 @@
+
 {
   "examples": [
-    {"month": 1, "sales": 100},
-    {"month": 2, "sales": 110},
-    {"month": 3, "sales": 120},
-    {"month": 4, "sales": 130},
-    {"month": 5, "sales": 140},
-    {"month": 6, "sales": 150}
+    {
+      "month": 1,
+      "sales": 100
+    },
+    {
+      "month": 2,
+      "sales": 110
+    },
+    {
+      "month": 3,
+      "sales": 120
+    },
+    {
+      "month": 4,
+      "sales": 130
+    },
+    {
+      "month": 5,
+      "sales": 140
+    },
+    {
+      "month": 6,
+      "sales": 150
+    }
   ]
 }
