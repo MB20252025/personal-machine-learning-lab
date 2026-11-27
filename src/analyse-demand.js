@@ -11,39 +11,45 @@ function analyseDemand(sales) {
 
   const patterns = [];
 
-  // Underlying direction
-  if (features.relativeTrend > 0.02) {
-    patterns.push("increasing");
-  } else if (features.relativeTrend < -0.02) {
-    patterns.push("declining");
-  } else {
-    patterns.push("stable");
-  }
+  const isIntermittent = features.zeroRate >= 0.4;
 
-  // Intermittent demand
-  if (features.zeroRate >= 0.4) {
+  // Intermittent demand takes priority because
+  // zero-demand months are normal for this behaviour.
+  if (isIntermittent) {
     patterns.push("intermittent");
-  }
+  } else {
+    // Underlying direction
+    if (features.relativeTrend > 0.02) {
+      patterns.push("increasing");
+    } else if (features.relativeTrend < -0.02) {
+      patterns.push("declining");
+    } else {
+      patterns.push("stable");
+    }
 
-  // Possible seasonality
-  if (
-    features.seasonalCorrelation !== null &&
-    features.seasonalCorrelation >= 0.7
-  ) {
-    patterns.push("possible-seasonality");
-  }
+    // Seasonality is only considered when there
+    // is enough evidence of a repeating pattern.
+    if (
+      features.seasonalCorrelation !== null &&
+      features.seasonalCorrelation >= 0.7 &&
+      Math.abs(features.relativeTrend) < 0.02
+    ) {
+      patterns.push("possible-seasonality");
+    }
 
-  // Unusual individual orders
-  if (spikeResults.spikeCount > 0) {
-    patterns.push("spiky");
-  }
+    // Individual unusually large orders
+    if (spikeResults.spikeCount > 0) {
+      patterns.push("spiky");
+    }
 
-  // Irregular variation
-  if (
-    features.relativeVolatility > 0.15 &&
-    spikeResults.spikeCount === 0
-  ) {
-    patterns.push("volatile");
+    // Irregular variation, excluding identified spikes
+    if (
+      features.relativeVolatility > 0.15 &&
+      spikeResults.spikeCount === 0 &&
+      !patterns.includes("possible-seasonality")
+    ) {
+      patterns.push("volatile");
+    }
   }
 
   return {
