@@ -1,0 +1,20 @@
+
+{
+  "name": "Increasing Demand",
+  "pattern": "increasing",
+  "description": "Demand steadily increases over time.",
+  "examples": [
+    { "month": 1, "sales": 50 },
+    { "month": 2, "sales": 58 },
+    { "month": 3, "sales": 65 },
+    { "month": 4, "sales": 72 },
+    { "month": 5, "sales": 80 },
+    { "month": 6, "sales": 88 },
+    { "month": 7, "sales": 95 },
+    { "month": 8, "sales": 103 },
+    { "month": 9, "sales": 110 },
+    { "month": 10, "sales": 118 },
+    { "month": 11, "sales": 125 },
+    { "month": 12, "sales": 133 }
+  ]
+}
