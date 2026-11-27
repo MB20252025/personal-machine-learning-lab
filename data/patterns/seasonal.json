@@ -1,0 +1,32 @@
+
+{
+  "name": "Seasonal Demand",
+  "pattern": "seasonal",
+  "description": "Demand follows a repeating seasonal pattern, with higher and lower sales at predictable times.",
+  "examples": [
+    { "month": 1, "sales": 60 },
+    { "month": 2, "sales": 65 },
+    { "month": 3, "sales": 80 },
+    { "month": 4, "sales": 100 },
+    { "month": 5, "sales": 120 },
+    { "month": 6, "sales": 140 },
+    { "month": 7, "sales": 150 },
+    { "month": 8, "sales": 135 },
+    { "month": 9, "sales": 110 },
+    { "month": 10, "sales": 90 },
+    { "month": 11, "sales": 75 },
+    { "month": 12, "sales": 65 },
+    { "month": 13, "sales": 60 },
+    { "month": 14, "sales": 65 },
+    { "month": 15, "sales": 80 },
+    { "month": 16, "sales": 100 },
+    { "month": 17, "sales": 120 },
+    { "month": 18, "sales": 140 },
+    { "month": 19, "sales": 150 },
+    { "month": 20, "sales": 135 },
+    { "month": 21, "sales": 110 },
+    { "month": 22, "sales": 90 },
+    { "month": 23, "sales": 75 },
+    { "month": 24, "sales": 65 }
+  ]
+}
