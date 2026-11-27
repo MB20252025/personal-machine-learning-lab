@@ -1,0 +1,324 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal Machine Learning Lab</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #f1f4f3;
+  color: #243342;
+  font-family: Arial, sans-serif;
+}
+header {
+  background: #142b3d;
+  color: white;
+  padding: 25px 22px;
+}
+header h1 { margin: 0 0 7px; font-size: 23px; }
+header p { margin: 0; color: #c5d4dc; font-size: 14px; }
+main { max-width: 1100px; margin: auto; padding: 20px; }
+h2 { font-size: 18px; margin: 28px 0 14px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 17px;
+  box-shadow: 0 2px 8px #172b3d0c;
+  min-width: 0;
+}
+.metric-label {
+  color: #71808c;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.metric {
+  font-size: 27px;
+  font-weight: bold;
+  margin-top: 9px;
+  color: #315e45;
+  overflow-wrap: anywhere;
+}
+.small { color: #71808c; font-size: 13px; margin-top: 6px; }
+.chart-card { margin-top: 14px; }
+svg { width: 100%; height: auto; display: block; }
+.status {
+  display: inline-block;
+  background: #e6f1e8;
+  color: #315e45;
+  border-radius: 20px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: bold;
+}
+.warning {
+  background: #fff5df;
+  color: #795719;
+  padding: 13px;
+  border-radius: 9px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #edf0ef;
+  font-size: 14px;
+}
+.result-row:last-child { border: 0; }
+footer {
+  text-align: center;
+  color: #82909a;
+  font-size: 12px;
+  padding: 25px;
+}
+@media (min-width: 700px) {
+  .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Personal Machine Learning Lab</h1>
+  <p>Learning, understanding and analysing demand</p>
+</header>
+
+<main>
+  <h2>Machine Learning Model</h2>
+
+  <div class="grid">
+    <div class="card">
+      <div class="metric-label">Learned weight</div>
+      <div class="metric" id="weight">Loading</div>
+      <div class="small">Model parameter</div>
+    </div>
+    <div class="card">
+      <div class="metric-label">Learned bias</div>
+      <div class="metric" id="bias">Loading</div>
+      <div class="small">Model parameter</div>
+    </div>
+    <div class="card">
+      <div class="metric-label">Training examples</div>
+      <div class="metric" id="trainedOn">Loading</div>
+      <div class="small">Observations used</div>
+    </div>
+    <div class="card">
+      <div class="metric-label">Month 7 prediction</div>
+      <div class="metric" id="prediction">Loading</div>
+      <div class="small">Predicted sales</div>
+    </div>
+  </div>
+
+  <div class="card chart-card">
+    <h2>Training Data and Learned Model</h2>
+    <svg id="chart" viewBox="0 0 700 290"
+         role="img" aria-label="Training sales and model prediction chart">
+      <text x="20" y="35" fill="#71808c">
+        Loading chart...
+      </text>
+    </svg>
+    <div class="small">
+      Dots show actual training observations. The line shows the
+      relationship learned by the model.
+    </div>
+  </div>
+
+  <h2>Demand Intelligence</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="metric-label">Demand behaviour</div>
+      <div class="metric" style="font-size:20px">Analysis modules</div>
+      <div class="small">Stable, increasing, declining,
+        intermittent and volatile demand</div>
+      <p><span class="status">Built — integration pending</span></p>
+    </div>
+    <div class="card">
+      <div class="metric-label">Seasonal analysis</div>
+      <div class="metric" style="font-size:20px">5 analysis sections</div>
+      <div class="small">Seasonal profile, consistency,
+        recent change and pattern change</div>
+      <p><span class="status">Tested</span></p>
+    </div>
+  </div>
+
+  <h2>Latest Seasonal Test Results</h2>
+  <div class="card">
+    <div class="warning">
+      These results come from our latest synthetic test dataset.
+      They are not calculated from the six-month training dataset.
+    </div>
+    <div class="result-row">
+      <span>Recent seasonal change</span>
+      <strong>Above seasonal level</strong>
+    </div>
+    <div class="result-row">
+      <span>Seasonal pattern</span>
+      <strong>No clear change</strong>
+    </div>
+    <div class="result-row">
+      <span>Seasonal strength change</span>
+      <strong>-0.101</strong>
+    </div>
+    <div class="result-row">
+      <span>Usable years analysed</span>
+      <strong>3</strong>
+    </div>
+    <div class="result-row">
+      <span>Seasonal consistency</span>
+      <strong>Mostly high</strong>
+    </div>
+  </div>
+
+  <h2>Project Status</h2>
+  <div class="card">
+    <div class="result-row">
+      <span>Original linear regression</span>
+      <span class="status">Working</span>
+    </div>
+    <div class="result-row">
+      <span>Demand behaviour recognition</span>
+      <span class="status">Tested</span>
+    </div>
+    <div class="result-row">
+      <span>Seasonal analysis</span>
+      <span class="status">Tested</span>
+    </div>
+    <div class="result-row">
+      <span>Dashboard integration</span>
+      <span class="status">In progress</span>
+    </div>
+  </div>
+</main>
+
+<footer>Personal Machine Learning Lab — Development Prototype</footer>
+
+<script>
+async function loadDashboard() {
+  try {
+    const [dataResponse, modelResponse] = await Promise.all([
+      fetch("data/training-data.json"),
+      fetch("models/model.json")
+    ]);
+
+    if (!dataResponse.ok || !modelResponse.ok) {
+      throw new Error("Could not load the project data files.");
+    }
+
+    const data = await dataResponse.json();
+    const model = await modelResponse.json();
+
+    const examples = data.examples;
+    const prediction = model.weight * 7 + model.bias;
+
+    document.getElementById("weight").textContent =
+      model.weight.toFixed(2);
+    document.getElementById("bias").textContent =
+      model.bias.toFixed(2);
+    document.getElementById("trainedOn").textContent =
+      model.trainedOn;
+    document.getElementById("prediction").textContent =
+      prediction.toFixed(2);
+
+    drawChart(examples, model);
+  } catch (error) {
+    document.getElementById("chart").innerHTML =
+      '<text x="20" y="40" fill="#a33">' +
+      'Dashboard could not load its data. Check the local server.' +
+      '</text>';
+    console.error(error);
+  }
+}
+
+function drawChart(examples, model) {
+  const svg = document.getElementById("chart");
+  const width = 700;
+  const height = 290;
+  const left = 55;
+  const right = 20;
+  const top = 20;
+  const bottom = 45;
+
+  const maxMonth = Math.max(
+    7, ...examples.map(item => item.month)
+  );
+  const maxSales = Math.max(
+    ...examples.map(item => item.sales),
+    model.weight * 7 + model.bias
+  ) * 1.15;
+
+  const x = month =>
+    left + (month / maxMonth) * (width - left - right);
+
+  const y = sales =>
+    height - bottom - (sales / maxSales) *
+    (height - top - bottom);
+
+  let output = "";
+
+  for (let i = 0; i <= 4; i++) {
+    const value = maxSales * i / 4;
+    output += `
+      <line x1="${left}" y1="${y(value)}"
+        x2="${width-right}" y2="${y(value)}"
+        stroke="#e5eae8"/>
+      <text x="${left-10}" y="${y(value)+4}"
+        text-anchor="end" font-size="11" fill="#71808c">
+        ${Math.round(value)}
+      </text>`;
+  }
+
+  output += `
+    <line x1="${left}" y1="${top}"
+      x2="${left}" y2="${height-bottom}" stroke="#9aa8a1"/>
+    <line x1="${left}" y1="${height-bottom}"
+      x2="${width-right}" y2="${height-bottom}" stroke="#9aa8a1"/>
+  `;
+
+  const lineStart = model.weight * 1 + model.bias;
+  const lineEnd = model.weight * 7 + model.bias;
+
+  output += `
+    <line x1="${x(1)}" y1="${y(lineStart)}"
+      x2="${x(7)}" y2="${y(lineEnd)}"
+      stroke="#436c47" stroke-width="3"/>
+  `;
+
+  examples.forEach(item => {
+    output += `
+      <circle cx="${x(item.month)}" cy="${y(item.sales)}"
+        r="5" fill="#315e9a"/>
+      <text x="${x(item.month)}" y="${height-bottom+20}"
+        text-anchor="middle" font-size="11" fill="#71808c">
+        ${item.month}
+      </text>`;
+  });
+
+  output += `
+    <circle cx="${x(7)}" cy="${y(lineEnd)}"
+      r="7" fill="#436c47" stroke="white" stroke-width="2"/>
+    <text x="${x(7)-5}" y="${y(lineEnd)-13}"
+      text-anchor="end" font-size="12" fill="#315e45">
+      Prediction: ${lineEnd.toFixed(0)}
+    </text>
+    <text x="350" y="285" text-anchor="middle"
+      font-size="12" fill="#71808c">Month</text>
+  `;
+
+  svg.innerHTML = output;
+}
+
+loadDashboard();
+</script>
+</body>
+</html>
