@@ -1,0 +1,20 @@
+
+{
+  "name": "Stable Demand",
+  "pattern": "stable",
+  "description": "Demand stays around 100 units per month.",
+  "examples": [
+    { "month": 1, "sales": 100 },
+    { "month": 2, "sales": 102 },
+    { "month": 3, "sales": 98 },
+    { "month": 4, "sales": 101 },
+    { "month": 5, "sales": 99 },
+    { "month": 6, "sales": 100 },
+    { "month": 7, "sales": 103 },
+    { "month": 8, "sales": 97 },
+    { "month": 9, "sales": 101 },
+    { "month": 10, "sales": 99 },
+    { "month": 11, "sales": 100 },
+    { "month": 12, "sales": 102 }
+  ]
+}
