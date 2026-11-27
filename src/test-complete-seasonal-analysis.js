@@ -7,14 +7,14 @@ const yearlyDemand = [
   180, 170, 140, 110, 80, 60
 ];
 
-// Three years of seasonal demand with gradual growth.
+// Same seasonal pattern, with sales growing each year.
 const sales = [
   ...yearlyDemand,
   ...yearlyDemand.map(value => value * 1.1),
   ...yearlyDemand.map(value => value * 1.2)
 ];
 
-// Introduce a recent increase in the final two months.
+// Introduce an unusual recent increase.
 sales[34] = 180;
 sales[35] = 135;
 
@@ -24,30 +24,27 @@ console.log("==============================");
 
 const result = completeSeasonalAnalysis(sales);
 
-console.log("\n1. SEASONAL PROFILE");
-
-console.log(
-  "Overall average demand:",
-  result.seasonalProfile.overallAverageDemand
-);
+console.log("\n1. NORMALISED SEASONAL PROFILE");
 
 result.seasonalProfile.months.forEach(month => {
   console.log(
     "Month:", month.month,
-    "| Average:", month.averageDemand,
-    "| Seasonal index:", month.seasonalIndex
+    "| Seasonal index:", month.seasonalIndex,
+    "| Years used:", month.observations
   );
 });
 
-console.log("\n2. SEASONAL CONSISTENCY");
+console.log("\n2. YEARLY SALES LEVELS");
 
-result.seasonalConsistency.yearlyProfiles.forEach(year => {
+result.seasonalProfile.yearlyProfiles.forEach(year => {
   console.log(
     "Year:", year.year,
     "| Average demand:", year.averageDemand,
     "| Usable months:", year.usableMonths
   );
 });
+
+console.log("\n3. SEASONAL CONSISTENCY");
 
 result.seasonalConsistency.months.forEach(month => {
   console.log(
@@ -58,7 +55,7 @@ result.seasonalConsistency.months.forEach(month => {
   );
 });
 
-console.log("\n3. RECENT SEASONAL CHANGE");
+console.log("\n4. RECENT SEASONAL CHANGE");
 
 console.log(
   "Classification:",
@@ -73,16 +70,6 @@ console.log(
 console.log(
   "Average change:",
   result.recentSeasonalChange.averageChange
-);
-
-console.log(
-  "Largest increase:",
-  result.recentSeasonalChange.largestIncrease
-);
-
-console.log(
-  "Largest decrease:",
-  result.recentSeasonalChange.largestDecrease
 );
 
 console.log(
