@@ -5,9 +5,12 @@ function detectSeasonalChange(sales, recentWindowSize = 5) {
   }
 
   if (!sales.every(value =>
-    Number.isFinite(value) && value >= 0
+    value === null ||
+    (Number.isFinite(value) && value >= 0)
   )) {
-    throw new Error("Sales must be valid non-negative numbers");
+    throw new Error(
+      "Sales must be non-negative numbers or null for missing data"
+    );
   }
 
   if (
@@ -20,15 +23,27 @@ function detectSeasonalChange(sales, recentWindowSize = 5) {
 
   const recentStart = sales.length - recentWindowSize;
   const comparisons = [];
+  let skippedComparisons = 0;
 
   for (let i = 0; i < recentWindowSize; i++) {
     const currentIndex = recentStart + i;
     const previousYearIndex = currentIndex - 12;
 
-    if (previousYearIndex < 0) continue;
+    if (previousYearIndex < 0) {
+      skippedComparisons++;
+      continue;
+    }
 
     const currentValue = sales[currentIndex];
     const previousValue = sales[previousYearIndex];
+
+    if (
+      currentValue === null ||
+      previousValue === null
+    ) {
+      skippedComparisons++;
+      continue;
+    }
 
     const percentageChange = previousValue === 0
       ? null
@@ -82,6 +97,8 @@ function detectSeasonalChange(sales, recentWindowSize = 5) {
   return {
     observations: sales.length,
     recentWindowSize,
+    validComparisons: comparisons.length,
+    skippedComparisons,
 
     averageChange: averageChange === null
       ? null
@@ -89,7 +106,6 @@ function detectSeasonalChange(sales, recentWindowSize = 5) {
 
     largestIncrease,
     largestDecrease,
-
     classification,
     comparisons
   };
