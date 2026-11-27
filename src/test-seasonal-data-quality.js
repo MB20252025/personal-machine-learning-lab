@@ -15,56 +15,49 @@ function createThreeYears() {
   ];
 }
 
-// TEST 1: Genuine zero sales in the latest month.
+function runTest(name, sales) {
+  console.log("\n==============================");
+  console.log(name);
+  console.log("==============================");
+
+  const result = detectSeasonalChange(sales);
+
+  console.log("Classification:", result.classification);
+  console.log("Valid comparisons:", result.validComparisons);
+  console.log("Skipped missing data:", result.skippedMissingData);
+  console.log("Skipped zero baseline:", result.skippedZeroBaseline);
+  console.log("Average change:", result.averageChange);
+}
+
+// TEST 1: Genuine zero sales.
 const zeroSalesDemand = createThreeYears();
 zeroSalesDemand[35] = 0;
 
-// TEST 2: Missing data in the latest month.
+runTest("TEST 1: GENUINE ZERO SALES", zeroSalesDemand);
+
+// TEST 2: One missing month.
 const missingMonthDemand = createThreeYears();
 missingMonthDemand[35] = null;
 
-// TEST 3: Previous year's matching month had zero sales.
+runTest("TEST 2: ONE MISSING MONTH", missingMonthDemand);
+
+// TEST 3: Zero sales in the previous year.
 const zeroBaselineDemand = createThreeYears();
 zeroBaselineDemand[23] = 0;
 
-console.log("\n==============================");
-console.log("TEST 1: GENUINE ZERO SALES");
-console.log("==============================");
+runTest("TEST 3: ZERO PREVIOUS-YEAR SALES", zeroBaselineDemand);
 
-const zeroResult =
-  detectSeasonalChange(zeroSalesDemand);
+// TEST 4: Several missing months.
+const multipleMissingDemand = createThreeYears();
 
-console.log("Classification:", zeroResult.classification);
-console.log("Valid comparisons:", zeroResult.validComparisons);
-console.log("Skipped missing data:", zeroResult.skippedMissingData);
-console.log("Skipped zero baseline:", zeroResult.skippedZeroBaseline);
-console.log("Latest comparison:", zeroResult.comparisons.slice(-1));
+multipleMissingDemand[31] = null;
+multipleMissingDemand[32] = null;
+multipleMissingDemand[33] = null;
+multipleMissingDemand[34] = null;
+multipleMissingDemand[35] = null;
 
-console.log("\n==============================");
-console.log("TEST 2: MISSING MONTH");
-console.log("==============================");
-
-const missingResult =
-  detectSeasonalChange(missingMonthDemand);
-
-console.log("Classification:", missingResult.classification);
-console.log("Valid comparisons:", missingResult.validComparisons);
-console.log("Skipped missing data:", missingResult.skippedMissingData);
-console.log("Skipped zero baseline:", missingResult.skippedZeroBaseline);
+runTest("TEST 4: FIVE MISSING MONTHS", multipleMissingDemand);
 
 console.log("\n==============================");
-console.log("TEST 3: ZERO PREVIOUS-YEAR SALES");
-console.log("==============================");
-
-const baselineResult =
-  detectSeasonalChange(zeroBaselineDemand);
-
-console.log("Classification:", baselineResult.classification);
-console.log("Valid comparisons:", baselineResult.validComparisons);
-console.log("Skipped missing data:", baselineResult.skippedMissingData);
-console.log("Skipped zero baseline:", baselineResult.skippedZeroBaseline);
-console.log("Latest comparison:", baselineResult.comparisons.slice(-1));
-
-console.log("\n==============================");
-console.log("DATA QUALITY TESTS COMPLETE");
+console.log("ALL DATA QUALITY TESTS COMPLETE");
 console.log("==============================");
