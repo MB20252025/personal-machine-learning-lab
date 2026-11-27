@@ -15,52 +15,79 @@ function extractBehaviourFeatures(sales) {
   const mean =
     sales.reduce((sum, value) => sum + value, 0) / count;
 
-  const variance =
-    sales.reduce((sum, value) =>
-      sum + Math.pow(value - mean, 2), 0
-    ) / count;
-
-  const standardDeviation = Math.sqrt(variance);
-
-  // Measure the direction of demand.
-  const xMean = (count - 1) / 2;
-
-  let numerator = 0;
-  let denominator = 0;
-
-  sales.forEach((value, index) => {
-    numerator += (index - xMean) * (value - mean);
-    denominator += Math.pow(index - xMean, 2);
-  });
-
-  const slope = numerator / denominator;
-
-  // Express the trend relative to average demand.
-  const relativeTrend = mean === 0 ? 0 : slope / mean;
-
-  // Measure changes between consecutive periods.
-  const differences = sales.slice(1).map((value, index) =>
-    value - sales[index]
-  );
-
-  const differenceMean =
-    differences.reduce((sum, value) => sum + value, 0)
-    / differences.length;
-
-  const differenceVariance =
-    differences.reduce((sum, value) =>
-      sum + Math.pow(value - differenceMean, 2), 0
-    ) / differences.length;
-
-  const relativeVolatility = mean === 0
-    ? 0
-    : Math.sqrt(differenceVariance) / mean;
-
-  // Measure how frequently demand is zero.
   const zeroRate =
     sales.filter(value => value === 0).length / count;
 
-  // Check for a repeating 12-period pattern.
+  // Measure the underlying trend.
+  let relativeTrend;
+
+  if (count >= 24) {
+    const firstYear = sales.slice(0, 12);
+    const lastYear = sales.slice(-12);
+
+    const firstAverage =
+      firstYear.reduce((sum, value) => sum + value, 0) / 12;
+
+    const lastAverage =
+      lastYear.reduce((sum, value) => sum + value, 0) / 12;
+
+    relativeTrend = mean === 0
+      ? 0
+      : (lastAverage - firstAverage) / mean;
+  } else {
+    const xMean = (count - 1) / 2;
+
+    let numerator = 0;
+    let denominator = 0;
+
+    sales.forEach((value, index) => {
+      numerator += (index - xMean) * (value - mean);
+      denominator += Math.pow(index - xMean, 2);
+    });
+
+    const slope = numerator / denominator;
+
+    relativeTrend = mean === 0 ? 0 : slope / mean;
+  }
+
+  // Remove the average for each month to measure
+  // irregular variation rather than regular seasonality.
+  let residuals = sales.slice();
+
+  if (count >= 24) {
+    const seasonalAverages = Array(12).fill(0);
+
+    for (let month = 0; month < 12; month++) {
+      const values = [];
+
+      for (let i = month; i < count; i += 12) {
+        values.push(sales[i]);
+      }
+
+      seasonalAverages[month] =
+        values.reduce((sum, value) => sum + value, 0)
+        / values.length;
+    }
+
+    residuals = sales.map((value, index) =>
+      value - seasonalAverages[index % 12]
+    );
+  }
+
+  const residualMean =
+    residuals.reduce((sum, value) => sum + value, 0)
+    / count;
+
+  const residualVariance =
+    residuals.reduce((sum, value) =>
+      sum + Math.pow(value - residualMean, 2), 0
+    ) / count;
+
+  const relativeVolatility = mean === 0
+    ? 0
+    : Math.sqrt(residualVariance) / mean;
+
+  // Check whether the same 12-month pattern repeats.
   let seasonalCorrelation = null;
 
   if (count >= 24) {
@@ -68,12 +95,10 @@ function extractBehaviourFeatures(sales) {
     const second = sales.slice(12);
 
     const firstMean =
-      first.reduce((sum, value) => sum + value, 0)
-      / first.length;
+      first.reduce((sum, value) => sum + value, 0) / first.length;
 
     const secondMean =
-      second.reduce((sum, value) => sum + value, 0)
-      / second.length;
+      second.reduce((sum, value) => sum + value, 0) / second.length;
 
     let cross = 0;
     let firstVariance = 0;
@@ -88,9 +113,7 @@ function extractBehaviourFeatures(sales) {
       secondVariance += b * b;
     }
 
-    const divisor = Math.sqrt(
-      firstVariance * secondVariance
-    );
+    const divisor = Math.sqrt(firstVariance * secondVariance);
 
     seasonalCorrelation =
       divisor === 0 ? null : cross / divisor;
