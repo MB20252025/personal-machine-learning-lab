@@ -2,29 +2,27 @@
 const detectSeasonalPatternChange =
   require("./seasonal-pattern-change");
 
-// Original annual seasonal pattern.
 const seasonalYear = [
   50, 60, 80, 100, 130, 160,
   180, 170, 140, 110, 80, 60
 ];
 
-// Same pattern, but stronger seasonal peaks.
 const strongerYear = [
   30, 40, 60, 90, 140, 190,
   230, 210, 160, 110, 70, 40
 ];
 
-// Same pattern, but weaker seasonal peaks.
 const weakerYear = [
   90, 95, 98, 100, 102, 105,
   110, 108, 105, 100, 97, 90
 ];
 
-// Seasonal peak moves from July to December.
 const shiftedYear = [
   100, 90, 80, 70, 60, 80,
   120, 110, 90, 100, 140, 180
 ];
+
+const stableYear = Array(12).fill(100);
 
 const scenarios = [
   {
@@ -36,7 +34,7 @@ const scenarios = [
     ]
   },
   {
-    name: "CHANGING SEASONAL STRENGTH",
+    name: "INCREASING SEASONAL STRENGTH",
     sales: [
       ...seasonalYear,
       ...seasonalYear,
@@ -44,7 +42,7 @@ const scenarios = [
     ]
   },
   {
-    name: "WEAKENING SEASONAL PATTERN",
+    name: "DECREASING SEASONAL STRENGTH",
     sales: [
       ...seasonalYear,
       ...seasonalYear,
@@ -64,10 +62,26 @@ const scenarios = [
     sales: [
       ...seasonalYear,
       ...seasonalYear,
-      ...shiftedYear.slice(0, 12)
+      ...shiftedYear
     ].map((value, index) =>
       [26, 30].includes(index) ? null : value
     )
+  },
+  {
+    name: "EMERGING SEASONALITY",
+    sales: [
+      ...stableYear,
+      ...stableYear,
+      ...seasonalYear
+    ]
+  },
+  {
+    name: "DISAPPEARING SEASONALITY",
+    sales: [
+      ...seasonalYear,
+      ...seasonalYear,
+      ...stableYear
+    ]
   }
 ];
 
@@ -96,4 +110,4 @@ scenarios.forEach(scenario => {
   });
 });
 
-console.log("\nALL SEASONAL PATTERN CHANGE TESTS COMPLETE");
+console.log("\nALL SEVEN SEASONAL PATTERN TESTS COMPLETE");
