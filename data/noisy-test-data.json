@@ -1,0 +1,9 @@
+
+{
+  "examples": [
+    {"month": 9, "sales": 185},
+    {"month": 10, "sales": 188},
+    {"month": 11, "sales": 202},
+    {"month": 12, "sales": 207}
+  ]
+}
