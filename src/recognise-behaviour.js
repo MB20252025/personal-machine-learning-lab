@@ -7,15 +7,26 @@ function recogniseBehaviour(sales) {
 
   let behaviour;
 
+  // Check intermittent demand first.
   if (features.zeroRate >= 0.4) {
     behaviour = "intermittent";
-  } else if (features.relativeTrend > 0.02) {
-    behaviour = "increasing";
-  } else if (features.relativeTrend < -0.02) {
-    behaviour = "declining";
-  } else if (features.relativeVolatility > 0.15) {
+  }
+
+  // Check volatility before trend.
+  else if (features.relativeVolatility > 0.15) {
     behaviour = "volatile";
-  } else {
+  }
+
+  // Then examine demand direction.
+  else if (features.relativeTrend > 0.02) {
+    behaviour = "increasing";
+  }
+
+  else if (features.relativeTrend < -0.02) {
+    behaviour = "declining";
+  }
+
+  else {
     behaviour = "stable";
   }
 
