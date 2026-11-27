@@ -19,9 +19,15 @@ const increasedSeasonalDemand = [
   ...yearlyDemand
 ];
 
-// Increase the final two months compared with previous years.
 increasedSeasonalDemand[34] = 120;
 increasedSeasonalDemand[35] = 90;
+
+// Demand grows by 10% each year.
+const graduallyIncreasingSeasonalDemand = [
+  ...yearlyDemand,
+  ...yearlyDemand.map(value => value * 1.1),
+  ...yearlyDemand.map(value => value * 1.2)
+];
 
 function runTest(name, sales) {
   console.log("\n================================");
@@ -60,4 +66,9 @@ runTest(
 runTest(
   "Seasonal demand with recent increase",
   increasedSeasonalDemand
+);
+
+runTest(
+  "Gradually increasing seasonal demand",
+  graduallyIncreasingSeasonalDemand
 );
