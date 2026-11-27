@@ -44,13 +44,13 @@ function calculateBehaviourConfidence(sales) {
       confidence = Math.max(
         0,
         100 -
-        Math.abs(features.relativeTrend) / 0.02 * 50 -
-        features.relativeVolatility / 0.15 * 50
+        Math.abs(features.relativeTrend) / 0.02 * 100 -
+        features.relativeVolatility / 0.15 * 30
       );
       break;
   }
 
-  // Short histories provide less evidence.
+  // Reduce confidence when history is short.
   const dataFactor = Math.min(
     1,
     sales.length / 12
