@@ -1,0 +1,32 @@
+
+{
+  "name": "Intermittent Demand",
+  "pattern": "intermittent",
+  "description": "Demand occurs irregularly, with long periods of zero sales followed by occasional orders.",
+  "examples": [
+    { "month": 1, "sales": 0 },
+    { "month": 2, "sales": 0 },
+    { "month": 3, "sales": 45 },
+    { "month": 4, "sales": 0 },
+    { "month": 5, "sales": 0 },
+    { "month": 6, "sales": 70 },
+    { "month": 7, "sales": 0 },
+    { "month": 8, "sales": 0 },
+    { "month": 9, "sales": 35 },
+    { "month": 10, "sales": 0 },
+    { "month": 11, "sales": 85 },
+    { "month": 12, "sales": 0 },
+    { "month": 13, "sales": 0 },
+    { "month": 14, "sales": 55 },
+    { "month": 15, "sales": 0 },
+    { "month": 16, "sales": 0 },
+    { "month": 17, "sales": 95 },
+    { "month": 18, "sales": 0 },
+    { "month": 19, "sales": 40 },
+    { "month": 20, "sales": 0 },
+    { "month": 21, "sales": 0 },
+    { "month": 22, "sales": 75 },
+    { "month": 23, "sales": 0 },
+    { "month": 24, "sales": 60 }
+  ]
+}
